@@ -19,7 +19,7 @@ class AppRouter {
             path: "/profile",
             pageBuilder: (context, state) => NoTransitionPage(
                 child: context.read<AccountBloc>().state.authorization != null
-                    ? const Profile()
+                    ? Profile()
                     : const Text('404'))),
       ],
       errorPageBuilder: (context, state) =>

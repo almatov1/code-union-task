@@ -1,4 +1,4 @@
-import 'package:code_union_task/module/shared/data/model/user.dart';
+import 'package:code_union_task/module/authorization/data/model/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 part 'account_event.dart';
 part 'account_state.dart';
