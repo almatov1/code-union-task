@@ -1,56 +1,55 @@
+import 'dart:convert';
+
 import 'package:code_union_task/module/authorization/data/api/api.dart';
 import 'package:code_union_task/core/component/bloc/account/account_bloc.dart';
 import 'package:code_union_task/core/component/utils/hex_color.dart';
 import 'package:code_union_task/module/authorization/data/model/login.dart';
+import 'package:code_union_task/module/shared/data/model/response_error.dart';
 import 'package:code_union_task/module/shared/data/model/user.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:code_union_task/module/shared/theme/modal/response_result_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
-@pragma('vm:entry-point')
-Route<Object?> _dialogBuilder({
-  required BuildContext context,
-  required bool success,
-}) {
-  return CupertinoDialogRoute<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return CupertinoAlertDialog(
-        title: const Text('Title'),
-        content: const Text('Content'),
-        actions: <Widget>[
-          Text(success ? 'Success' : 'Unsuccess'),
-        ],
-      );
-    },
-  );
-}
-
 confirmAuthorization(
     {required Login login, required BuildContext context}) async {
   http.Response response = await authorization(login: login);
   if (!context.mounted) return;
 
-  if (response.statusCode != 500) {
-    print('error: ${response.statusCode}');
+  Map jsonCodec = json.decode(response.body);
 
-    _dialogBuilder(context: context, success: false);
+  if (response.statusCode != 200) {
+    ResponseError errorResponse = ResponseError(
+      errors: jsonCodec['errors'],
+      message: jsonCodec['message'],
+      name: jsonCodec['name'],
+      status: jsonCodec['status'],
+    );
+
+    ResponseResultModal.dialogBuilder(
+      context: context,
+      success: false,
+      error: errorResponse.message,
+    );
   } else {
-    print(response.body);
-
     context.read<AccountBloc>().add(
           AccountAuthorizationEvent(
             Authorization(
-              tokens: Tokens(accessToken: "", refreshToken: ""),
-              user: User(id: 1, email: "", nickname: ""),
+              tokens: Tokens(
+                accessToken: jsonCodec['tokens']['accessToken'],
+                refreshToken: jsonCodec['tokens']['refreshToken'],
+              ),
+              user: User(
+                id: jsonCodec['user']['id'],
+                email: jsonCodec['user']['email'],
+                nickname: jsonCodec['user']['nickname'],
+              ),
             ),
           ),
         );
-
-    _dialogBuilder(context: context, success: true);
+    ResponseResultModal.dialogBuilder(context: context, success: true);
 
     context.go('/profile');
   }
@@ -119,6 +118,7 @@ class Auth extends StatelessWidget {
                     child: SizedBox(
                       height: 22,
                       child: TextFormField(
+                        obscureText: true,
                         controller: passwordController,
                         decoration: InputDecoration(
                           border: InputBorder.none,

@@ -23,7 +23,7 @@ class AppRouter {
                     : const Text('404'))),
       ],
       errorPageBuilder: (context, state) =>
-          const NoTransitionPage(child: Scaffold(body: Text("Ошибка 404"))));
+          const NoTransitionPage(child: Scaffold(body: Text("404"))));
 
   static GoRouter get router => _router;
 }
