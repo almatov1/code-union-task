@@ -3,6 +3,8 @@ import 'package:code_union_task/module/authorization/data/api/api.dart';
 import 'package:code_union_task/module/authorization/data/model/login.dart';
 import 'package:code_union_task/module/authorization/data/model/response_error.dart';
 import 'package:code_union_task/module/authorization/data/model/user.dart';
+import 'package:code_union_task/module/authorization/data/model/validate_result.dart';
+import 'package:code_union_task/module/authorization/service/validate_input.dart';
 import 'package:code_union_task/module/shared/theme/response_result_modal.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +13,19 @@ import 'package:go_router/go_router.dart';
 
 class ConfirmAuthorization {
   static exec({required Login login, required BuildContext context}) async {
+    //validate
+    ValidateResult validateResult = ValidateInput.validate(login: login);
+    if (!validateResult.result) {
+      ResponseResultModal.dialogBuilder(
+        context: context,
+        success: false,
+        error: validateResult.message,
+      );
+
+      return;
+    }
+
+    //request
     try {
       Response response = await authorization(login: login);
       if (!context.mounted) return;

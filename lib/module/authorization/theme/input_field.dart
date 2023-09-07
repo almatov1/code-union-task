@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
@@ -15,6 +16,9 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoTextField.borderless(
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(' '),
+      ],
       obscureText: obscureText,
       controller: controller,
       placeholder: placeholder,
