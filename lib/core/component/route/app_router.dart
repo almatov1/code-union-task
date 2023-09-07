@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+const Widget errorPage = Scaffold(body: Text("404"));
+
 class AppRouter {
   static final GoRouter _router = GoRouter(
       initialLocation: "/",
@@ -14,16 +16,16 @@ class AppRouter {
             pageBuilder: (context, state) => NoTransitionPage(
                 child: context.read<AccountBloc>().state.authorization == null
                     ? Auth()
-                    : const Text('404'))),
+                    : errorPage)),
         GoRoute(
             path: "/profile",
             pageBuilder: (context, state) => NoTransitionPage(
                 child: context.read<AccountBloc>().state.authorization != null
                     ? Profile()
-                    : const Text('404'))),
+                    : errorPage)),
       ],
       errorPageBuilder: (context, state) =>
-          const NoTransitionPage(child: Scaffold(body: Text("404"))));
+          const NoTransitionPage(child: errorPage));
 
   static GoRouter get router => _router;
 }
