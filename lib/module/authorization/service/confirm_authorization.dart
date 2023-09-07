@@ -1,48 +1,31 @@
-import 'dart:convert';
-
 import 'package:code_union_task/core/component/bloc/account/account_bloc.dart';
 import 'package:code_union_task/module/authorization/data/api/api.dart';
 import 'package:code_union_task/module/authorization/data/model/login.dart';
 import 'package:code_union_task/module/authorization/data/model/response_error.dart';
 import 'package:code_union_task/module/authorization/data/model/user.dart';
 import 'package:code_union_task/module/shared/theme/response_result_modal.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 
 class ConfirmAuthorization {
   static exec({required Login login, required BuildContext context}) async {
-    http.Response response = await authorization(login: login);
-    if (!context.mounted) return;
+    try {
+      Response response = await authorization(login: login);
+      if (!context.mounted) return;
 
-    Map jsonCodec = json.decode(response.body);
-
-    if (response.statusCode != 200) {
-      ResponseError errorResponse = ResponseError(
-        errors: response.statusCode == 500 ? null : jsonCodec['errors'],
-        message: response.statusCode == 500 ? null : jsonCodec['message'],
-        name: response.statusCode == 500 ? null : jsonCodec['name'],
-        status: response.statusCode == 500 ? null : jsonCodec['status'],
-      );
-
-      ResponseResultModal.dialogBuilder(
-        context: context,
-        success: false,
-        error: response.statusCode == 500 ? null : errorResponse.message,
-      );
-    } else {
       context.read<AccountBloc>().add(
             AccountAuthorizationEvent(
               Authorization(
                 tokens: Tokens(
-                  accessToken: jsonCodec['tokens']['accessToken'],
-                  refreshToken: jsonCodec['tokens']['refreshToken'],
+                  accessToken: response.data['tokens']['accessToken'],
+                  refreshToken: response.data['tokens']['refreshToken'],
                 ),
                 user: User(
-                  id: jsonCodec['user']['id'],
-                  email: jsonCodec['user']['email'],
-                  nickname: jsonCodec['user']['nickname'],
+                  id: response.data['user']['id'],
+                  email: response.data['user']['email'],
+                  nickname: response.data['user']['nickname'],
                 ),
               ),
             ),
@@ -50,6 +33,22 @@ class ConfirmAuthorization {
       ResponseResultModal.dialogBuilder(context: context, success: true);
 
       context.go('/profile');
+    } on DioException catch (e) {
+      ResponseError errorResponse = ResponseError(
+        errors:
+            e.response!.statusCode == 500 ? null : e.response!.data['errors'],
+        message:
+            e.response!.statusCode == 500 ? null : e.response!.data['message'],
+        name: e.response!.statusCode == 500 ? null : e.response!.data['name'],
+        status:
+            e.response!.statusCode == 500 ? null : e.response!.data['status'],
+      );
+
+      ResponseResultModal.dialogBuilder(
+        context: context,
+        success: false,
+        error: e.response!.statusCode == 500 ? null : errorResponse.message,
+      );
     }
   }
 }
