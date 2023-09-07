@@ -1,3 +1,4 @@
+import 'package:code_union_task/core/component/theme/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +23,10 @@ class InputField extends StatelessWidget {
       obscureText: obscureText,
       controller: controller,
       placeholder: placeholder,
+      placeholderStyle: Theme.of(context)
+          .textTheme
+          .bodyMedium!
+          .copyWith(color: StandartColors.grey),
       style: Theme.of(context).textTheme.bodyMedium,
     );
   }

@@ -12,6 +12,7 @@ class StandartAppbar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: StandartColors.approxWhite,
+      centerTitle: true,
       title: Text(
         placeholder,
         style: Theme.of(context).textTheme.titleMedium,

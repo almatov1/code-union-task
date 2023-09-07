@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 class StandartColors {
   static Color black = HexColor.getHexColor('#000000');
   static Color white = HexColor.getHexColor('#FFFFFF');
+  static Color grey = HexColor.getHexColor('#C3C3C3');
   static Color approxWhite = HexColor.getHexColor('#FEFEFE');
   static Color approxSolitude = HexColor.getHexColor('#F3F4F6');
   static Color approxSolitudeMinimal = HexColor.getHexColor('#E0E6ED');
